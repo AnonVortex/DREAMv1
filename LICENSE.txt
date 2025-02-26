@@ -1,0 +1,9 @@
+Proprietary License - HMAS-AGI-Prototype
+© 2025 Alexis Soto-Yanez. All rights reserved.
+
+This software is proprietary and confidential. No part of this software may be
+reproduced, modified, or distributed without express permission from
+Alexis Soto-Yanez.
+
+No license to use, copy, or distribute this software is granted, except as
+explicitly agreed upon in writing by Alexis Soto-Yanez.
