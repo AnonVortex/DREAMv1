@@ -1,4 +1,4 @@
-# by Alelxis Soto-Yanez
+# by Alexis Soto-Yanez
 """
 Step 10: Monitoring, Maintenance, and Scalability for HMAS (AGI Prototype)
 
