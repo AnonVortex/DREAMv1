@@ -1,87 +1,98 @@
-#by Alexis Soto-Yanez
-"""
-Step 4: Task Decomposition and Routing for HMAS (AGI Prototype)
+# by Alexis Soto-Yanez
+import logging
 
-This script demonstrates how to interpret a unified representation from the
-working memory to establish an overall goal, decompose it into subtasks, and route
-these subtasks to specialized processing agents.
-"""
+logging.basicConfig(level=logging.INFO)
 
 class GoalInterpreter:
-    def interpret(self, fused_features):
+    def interpret_goal(self, goal):
         """
-        Interpret the overall goal from the fused sensory data.
-        For example, analyze the data and derive a high-level task.
+        Interprets a high-level goal (provided as a dictionary).
+        For example, if the goal has a 'type' field, it processes that to determine required subtask(s).
         """
-        goal = f"Interpret goal based on: {fused_features}"
-        print("[GoalInterpreter] Goal interpreted.")
+        logging.info("Interpreting goal...")
+        # In a production system, you might add natural language processing or rule-based logic here.
         return goal
 
 class TaskDecomposer:
     def decompose(self, goal):
         """
-        Decompose the interpreted goal into actionable subtasks.
+        Decomposes the goal into a list of subtasks.
+        If the goal type is 'graph_optimization', we generate a subtask for it.
+        Otherwise, we generate default subtasks.
         """
-        subtasks = ["reasoning", "planning", "knowledge_retrieval"]
-        print("[TaskDecomposer] Task decomposed into subtasks:", subtasks)
+        logging.info("Decomposing goal into subtasks...")
+        subtasks = []
+        if goal.get("type") == "graph_optimization":
+            subtasks.append({
+                "name": "graph_optimization",
+                "raw_data": goal.get("raw_data", {}),
+                "constraints": goal.get("constraints", {})
+            })
+        else:
+            subtasks.append({
+                "name": "default_task",
+                "data": goal.get("data", {})
+            })
         return subtasks
 
 class TaskRouter:
     def route(self, subtasks):
         """
-        Route each subtask to its respective specialized agent.
+        Routes each subtask to the appropriate specialized processing agent.
+        Returns a dictionary mapping subtask names to agent types.
         """
-        routing_info = {task: f"Agent for {task}" for task in subtasks}
-        print("[TaskRouter] Tasks routed:", routing_info)
+        logging.info("Routing subtasks to specialized agents...")
+        routing_info = {}
+        for subtask in subtasks:
+            if subtask["name"] == "graph_optimization":
+                routing_info[subtask["name"]] = "GraphOptimizationAgent"
+            else:
+                routing_info[subtask["name"]] = "DefaultProcessingAgent"
         return routing_info
 
-class DynamicReconfigurator:
-    def reconfigure(self, routing_info):
-        """
-        Optionally adjust the routing based on system feedback or dynamic conditions.
-        Here, we simply pass through the routing info.
-        """
-        updated_routing = routing_info  # Placeholder for dynamic adjustments.
-        print("[DynamicReconfigurator] Routing reconfigured (if needed).")
-        return updated_routing
-
 class TaskDecompositionRouting:
+    """
+    Wrapper class that integrates goal interpretation, task decomposition,
+    and task routing into one cohesive module.
+    """
     def __init__(self):
         self.goal_interpreter = GoalInterpreter()
         self.task_decomposer = TaskDecomposer()
         self.task_router = TaskRouter()
-        self.dynamic_reconfigurator = DynamicReconfigurator()
-
+    
     def run(self, working_memory):
         """
-        Execute task decomposition and routing:
-          1. Interpret the goal from fused features.
-          2. Decompose the goal into subtasks.
-          3. Route subtasks to specialized agents.
-          4. Optionally reconfigure the routing dynamically.
+        Runs the complete process using the provided working_memory.
+        working_memory should be a dictionary containing at least a 'goal' key.
+        
+        Returns:
+            routing_info (dict): Mapping of subtask names to agent types.
         """
-        fused_features = working_memory.get("fused", "")
-        goal = self.goal_interpreter.interpret(fused_features)
-        subtasks = self.task_decomposer.decompose(goal)
+        logging.info("Running Task Decomposition and Routing...")
+        # Retrieve the high-level goal from working_memory.
+        goal = working_memory.get("goal", {})
+        interpreted_goal = self.goal_interpreter.interpret_goal(goal)
+        subtasks = self.task_decomposer.decompose(interpreted_goal)
         routing_info = self.task_router.route(subtasks)
-        updated_routing = self.dynamic_reconfigurator.reconfigure(routing_info)
-        print("[TaskDecompositionRouting] Task decomposition and routing complete.")
-        return updated_routing
+        logging.info(f"Generated Routing Info: {routing_info}")
+        return routing_info
 
-# ----- Example Usage -----
 if __name__ == "__main__":
-    # Simulated working memory from Step 3.
-    simulated_working_memory = {
-        "fused": "temporally_aligned({'context': \"{'vision': 'vision_data', 'audition': 'audio_data', 'smell': 'smell_data', 'touch': 'touch_data', 'taste': 'taste_data'}\"})"
+    # For standalone testing, simulate a working memory with a graph optimization goal.
+    test_working_memory = {
+        "goal": {
+            "type": "graph_optimization",
+            "raw_data": {
+                "nodes": [
+                    {"id": 0, "features": [0.8]*10},
+                    {"id": 1, "features": [0.3]*10},
+                    {"id": 2, "features": [0.5]*10}
+                ],
+                "edges": [(0, 1), (1, 2), (2, 0)]
+            },
+            "constraints": {}
+        }
     }
-    
-    # Create the task decomposition and routing module.
-    task_decomposition = TaskDecompositionRouting()
-    
-    # Run the task decomposition and routing using the simulated working memory.
-    routing_info = task_decomposition.run(simulated_working_memory)
-    
-    # Print the final routing information.
-    print("\nFinal Routing Information:")
-    for task, agent in routing_info.items():
-        print(f"{task.capitalize()}: {agent}")
+    tdr = TaskDecompositionRouting()
+    routing_info = tdr.run(test_working_memory)
+    print("Routing Info:", routing_info)

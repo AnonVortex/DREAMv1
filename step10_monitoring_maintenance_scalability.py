@@ -1,92 +1,94 @@
+# step10_monitoring_maintenance_scalability.py
 # by Alexis Soto-Yanez
 """
-Step 10: Monitoring, Maintenance, and Scalability for HMAS (AGI Prototype)
+Monitoring, Maintenance & Scalability Module for HMAS Prototype
 
-This script implements modules to monitor system logs, diagnose issues, track resource usage,
-and control scalability strategies. These components are essential for ensuring the pipeline
-operates efficiently and can be scaled or maintained as needed.
+This module simulates continuous monitoring of system resources, diagnostic tests,
+and scalability decisions (e.g., whether to scale up resources). It is designed
+to be integrated as Step 10 in the end-to-end HMAS pipeline.
 """
 
-class Logger:
-    def log(self, message):
-        # In a real system, write the message to a log file or monitoring service.
-        print(f"[Logger] {message}")
+import logging
+import psutil  # Ensure psutil is installed: pip install psutil
+import time
 
-class DiagnosticTool:
-    def diagnose(self):
-        # Perform diagnostics on the system (e.g., checking for errors, latency, etc.).
-        diagnostic_result = "All systems operational."
-        print("[DiagnosticTool] Diagnosis complete.")
-        return diagnostic_result
+# Configure logging.
+logging.basicConfig(level=logging.INFO)
 
-class ResourceMonitor:
-    def monitor(self):
-        # Monitor system resources such as CPU, memory, and disk usage.
-        # Here, we simulate the monitoring with a placeholder message.
-        resource_usage = "Resource usage within acceptable limits."
-        print("[ResourceMonitor] Resource monitoring complete.")
-        return resource_usage
+def check_resource_usage():
+    """
+    Checks current system resource usage (CPU and memory).
+    
+    Returns:
+        dict: A dictionary with CPU and memory usage percentages.
+    """
+    try:
+        cpu_usage = psutil.cpu_percent(interval=1)
+        mem_usage = psutil.virtual_memory().percent
+    except Exception as e:
+        logging.warning("psutil error: %s", e)
+        cpu_usage = 50.0
+        mem_usage = 50.0
+    return {"cpu_usage": cpu_usage, "memory_usage": mem_usage}
 
-class ScalabilityController:
-    def control(self):
-        # Determine scaling strategies based on current load.
-        # For now, we simply return a placeholder decision.
-        scaling_decision = "Scaling decision: no scaling required."
-        print("[ScalabilityController] Scalability control complete.")
-        return scaling_decision
+def run_diagnostics():
+    """
+    Simulates running system diagnostics.
+    
+    Returns:
+        str: A summary message from diagnostics.
+    """
+    # Simulate diagnostic delay.
+    time.sleep(0.5)
+    diagnostics = "All systems operational."
+    return diagnostics
 
-class Monitoring:
-    def __init__(self):
-        self.logger = Logger()
-        self.diagnostic_tool = DiagnosticTool()
-        self.resource_monitor = ResourceMonitor()
-        self.scalability_controller = ScalabilityController()
-        self.logs = []
+def scale_if_needed(resource_usage):
+    """
+    Makes a scaling decision based on resource usage.
+    
+    Parameters:
+        resource_usage (dict): Contains CPU and memory usage.
+    
+    Returns:
+        str: A message indicating whether scaling is required.
+    """
+    if resource_usage["cpu_usage"] > 80 or resource_usage["memory_usage"] > 80:
+        decision = "Scaling up required."
+    else:
+        decision = "No scaling required."
+    return decision
 
-    def run(self, stage, message):
-        log_message = f"Stage {stage}: {message}"
-        self.logger.log(log_message)
-        self.logs.append(log_message)
-        return log_message
+def main():
+    """
+    Main function for the Monitoring, Maintenance & Scalability module.
+    
+    It simulates:
+      1. Checking resource usage.
+      2. Running diagnostics.
+      3. Deciding on scaling.
+    
+    Returns:
+        dict: A summary of resource usage, diagnostics, and scaling decision.
+    """
+    logging.info(">> Step 10: Monitoring, Maintenance, and Scalability")
+    
+    resource_usage = check_resource_usage()
+    diagnostics = run_diagnostics()
+    scaling_decision = scale_if_needed(resource_usage)
+    
+    logging.info("Resource Usage: %s", resource_usage)
+    logging.info("Diagnostics: %s", diagnostics)
+    logging.info("Scaling Decision: %s", scaling_decision)
+    
+    result = {
+        "resource_usage": resource_usage,
+        "diagnostics": diagnostics,
+        "scaling_decision": scaling_decision
+    }
+    
+    print("Monitoring Summary:", result)
+    return result
 
-    def diagnose_system(self):
-        return self.diagnostic_tool.diagnose()
-
-    def monitor_resources(self):
-        return self.resource_monitor.monitor()
-
-    def control_scalability(self):
-        return self.scalability_controller.control()
-
-# ----- Example Usage -----
 if __name__ == "__main__":
-    # Instantiate the Monitoring module.
-    monitoring = Monitoring()
-    
-    # Log various stages of the pipeline.
-    monitoring.run("DataIngestion", "Starting data ingestion and preprocessing.")
-    monitoring.run("Perception", "Processing multi-sensory data.")
-    monitoring.run("Integration", "Fusing features and updating working memory.")
-    monitoring.run("TaskDecomposition", "Decomposing tasks and routing subtasks.")
-    monitoring.run("SpecializedProcessing", "Executing specialized processing agents.")
-    monitoring.run("MetaCognition", "Evaluating outputs with meta-cognition.")
-    monitoring.run("LongTermMemory", "Archiving processed data in long-term memory.")
-    monitoring.run("DecisionAggregation", "Aggregating decisions and generating final output.")
-    monitoring.run("FeedbackLoop", "Running feedback loop for continuous learning.")
-    
-    # Run diagnostics, resource monitoring, and scalability control.
-    diagnosis = monitoring.diagnose_system()
-    resources = monitoring.monitor_resources()
-    scaling_decision = monitoring.control_scalability()
-    
-    # Log the diagnostic information.
-    monitoring.run("Diagnostics", diagnosis)
-    monitoring.run("ResourceMonitoring", resources)
-    monitoring.run("Scalability", scaling_decision)
-    
-    monitoring.run("Completion", "Pipeline execution completed.")
-    
-    # Print final logs (for demonstration purposes).
-    print("\nFinal Logs:")
-    for log in monitoring.logs:
-        print(log)
+    main()

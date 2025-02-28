@@ -1,93 +1,102 @@
+# step7_long_term_memory.py
 # by Alexis Soto-Yanez
 """
-Step 7: Long-Term Memory and Knowledge Base for HMAS (AGI Prototype)
+Long-Term Memory & Knowledge Base Module for HMAS Prototype
 
-This script simulates a long-term memory system that archives processed data,
-allows querying, extracts knowledge, and updates memory with new contextual information.
-It is designed to integrate with the outputs from previous pipeline stages.
+This module simulates the archival of processed data, learned patterns, and past decisions.
+It provides functionality to store data (archive) and later retrieve relevant historical context.
+This version includes a main() function for integration testing.
 """
 
+import logging
+import numpy as np
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
 class MemoryArchiver:
-    def archive(self, data):
-        # Archive the data for long-term storage.
-        print("[MemoryArchiver] Data archived.")
-        return f"archived({data})"
+    def __init__(self):
+        # In a real system, this might connect to a database or file storage.
+        # Here we simulate with an in-memory list.
+        self.archive = []
 
-class MemoryQuery:
-    def query(self, query_str, memory_archive):
-        # Simulate a query to the memory archive.
-        # For simplicity, we return the most recent archived data.
-        if memory_archive:
-            print("[MemoryQuery] Query executed.")
-            return memory_archive[-1]
-        else:
-            return "No data available."
-
-class KnowledgeExtractor:
-    def extract(self, archived_data):
-        # Simulate knowledge extraction from archived data.
-        extracted = f"extracted_knowledge({archived_data})"
-        print("[KnowledgeExtractor] Knowledge extracted.")
-        return extracted
-
-class ContextualUpdater:
-    def update(self, memory, new_data):
-        # Update long-term memory with new contextual information.
-        updated_memory = memory + [new_data]
-        print("[ContextualUpdater] Memory updated with new data.")
-        return updated_memory
+    def archive_data(self, data):
+        """
+        Archives the provided data.
+        
+        Parameters:
+            data (dict): The data to archive.
+        Returns:
+            str: Confirmation message.
+        """
+        self.archive.append(data)
+        logging.info("Data archived. Archive size: %d", len(self.archive))
+        return "Data archived successfully."
 
 class LongTermMemory:
-    def __init__(self):
-        self.memory_archive = []
-        self.archiver = MemoryArchiver()
-        self.query_engine = MemoryQuery()
-        self.knowledge_extractor = KnowledgeExtractor()
-        self.contextual_updater = ContextualUpdater()
+    def __init__(self, archiver):
+        """
+        Initializes the LongTermMemory with a given MemoryArchiver.
+        
+        Parameters:
+            archiver (MemoryArchiver): The archiver instance used for storing data.
+        """
+        self.archiver = archiver
 
-    def run(self, processed_data):
-        # Archive the processed data.
-        archived = self.archiver.archive(processed_data)
-        self.memory_archive.append(archived)
-        print("[LongTermMemory] Long-term memory updated.")
-        return self.memory_archive
+    def query_memory(self, query_params):
+        """
+        Simulates a query against the archived memory.
+        
+        Parameters:
+            query_params (dict): Parameters to filter archived data.
+        Returns:
+            list: List of archived items matching the query.
+        """
+        # For demonstration, return all archived items.
+        # In a real implementation, filter based on query_params.
+        logging.info("Querying long-term memory with params: %s", query_params)
+        return self.archiver.archive
 
-    def query_memory(self, query_str):
-        # Query the memory archive.
-        return self.query_engine.query(query_str, self.memory_archive)
+def main():
+    """
+    Main function for the Long-Term Memory & Knowledge Base module.
+    
+    Simulates archiving data from previous pipeline stages and then querying the memory.
+    
+    Returns:
+        dict: A summary containing the archive size and a sample query result.
+    """
+    logging.info(">> Step 7: Long-Term Memory and Knowledge Base")
+    
+    # Create an archiver instance.
+    archiver = MemoryArchiver()
+    
+    # Simulate data to archive.
+    # In a real system, this data might come from specialized processing outputs.
+    simulated_data_1 = {
+        "stage": "specialized_processing",
+        "result": {"graph_optimization_action": 3, "graph_optimization_value": 1.04}
+    }
+    simulated_data_2 = {
+        "stage": "meta_cognition",
+        "evaluation": {"Verification": "Outputs consistent", "Consensus": "Majority agreement reached"}
+    }
+    
+    # Archive the simulated data.
+    archiver.archive_data(simulated_data_1)
+    archiver.archive_data(simulated_data_2)
+    
+    # Initialize long-term memory with the archiver.
+    long_term_memory = LongTermMemory(archiver)
+    
+    # Simulate a query; here, we just pass an empty dict to return all archived data.
+    query_result = long_term_memory.query_memory({})
+    
+    logging.info("Long-Term Memory Query Result: %s", query_result)
+    print("Long-Term Memory Query Result:", query_result)
+    
+    # Return a summary for integration.
+    return {"archived_items": len(archiver.archive), "query_result": query_result}
 
-    def extract_knowledge(self):
-        # Extract knowledge from the most recent archived data.
-        if self.memory_archive:
-            return self.knowledge_extractor.extract(self.memory_archive[-1])
-        else:
-            return "No data available."
-
-    def update_memory(self, new_data):
-        # Update the memory archive with new contextual data.
-        self.memory_archive = self.contextual_updater.update(self.memory_archive, new_data)
-        return self.memory_archive
-
-# ----- Example Usage -----
 if __name__ == "__main__":
-    # Simulated processed data from previous pipeline stages.
-    processed_data = "specialized_processing_results"
-    
-    # Instantiate the LongTermMemory module.
-    long_term_memory = LongTermMemory()
-    
-    # Archive the processed data.
-    memory_archive = long_term_memory.run(processed_data)
-    print("\nMemory Archive:", memory_archive)
-    
-    # Query the memory.
-    query_result = long_term_memory.query_memory("latest")
-    print("Query Result:", query_result)
-    
-    # Extract knowledge from the most recent archive.
-    extracted_knowledge = long_term_memory.extract_knowledge()
-    print("Extracted Knowledge:", extracted_knowledge)
-    
-    # Update the memory with new contextual data.
-    updated_memory = long_term_memory.update_memory("new_contextual_data")
-    print("Updated Memory Archive:", updated_memory)
+    main()

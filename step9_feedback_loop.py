@@ -1,83 +1,125 @@
+# step9_feedback_loop.py
 # by Alexis Soto-Yanez
 """
-Step 9: Feedback Loop and Continuous Learning for HMAS (AGI Prototype)
+Feedback Loop & Continuous Learning Module for HMAS Prototype
 
-This script simulates a feedback loop that:
-  - Collects feedback on the final decision output.
-  - Updates pipeline parameters based on the feedback.
-  - Applies reinforcement learning updates.
-  - Logs performance metrics for future improvements.
-
-Each component is currently implemented with placeholder logic that can be expanded later.
+This module simulates the collection of performance data and feedback from previous
+pipeline stages. It then updates system parameters based on the feedback and logs
+the performance for continuous learning. This simplified implementation is intended
+to serve as a placeholder for more advanced reinforcement learning and adaptive updating.
 """
 
+import logging
+import random
+import time
+
+# Configure logging.
+logging.basicConfig(level=logging.INFO)
+
 class FeedbackCollector:
-    def collect(self, final_output):
+    def collect(self):
         """
-        Simulate feedback collection. In a real system, this might gather user inputs or sensor data.
+        Simulate the collection of feedback from the pipeline's output.
+        
+        Returns:
+            dict: A dictionary with simulated performance metrics.
         """
-        feedback = f"feedback({final_output})"
-        print("[FeedbackCollector] Feedback collected.")
+        # In a real system, feedback might come from sensors, user input, or automated metrics.
+        feedback = {
+            "accuracy": random.uniform(0.8, 1.0),
+            "latency": random.uniform(0.1, 0.5),
+            "error_rate": random.uniform(0.0, 0.05)
+        }
+        logging.info("Feedback collected: %s", feedback)
         return feedback
 
 class AdaptiveUpdater:
-    def update(self, feedback):
+    def update_parameters(self, feedback):
         """
-        Update pipeline parameters or configurations based on feedback.
+        Simulate updating system parameters based on collected feedback.
+        
+        Parameters:
+            feedback (dict): Feedback metrics.
+        
+        Returns:
+            dict: Updated parameters (dummy values for demonstration).
         """
-        # Placeholder: Implement adaptive update logic.
-        print("[AdaptiveUpdater] Pipeline parameters updated based on feedback.")
-        return True
+        # In a real implementation, use feedback to adjust hyperparameters, model weights, etc.
+        updated_params = {
+            "learning_rate": 0.001 * (1 - feedback["error_rate"]),
+            "batch_size": int(32 * feedback["accuracy"]),
+            "update_frequency": max(1, int(10 * feedback["latency"]))
+        }
+        logging.info("System parameters updated based on feedback: %s", updated_params)
+        return updated_params
 
 class ReinforcementLearningModule:
-    def reinforce(self, feedback):
+    def apply_rl(self, updated_params):
         """
-        Apply reinforcement learning updates to improve the system.
+        Simulate applying reinforcement learning based on updated parameters.
+        
+        Parameters:
+            updated_params (dict): Parameters updated from feedback.
+        
+        Returns:
+            str: A status message.
         """
-        # Placeholder: Implement RL update logic.
-        print("[ReinforcementLearningModule] Reinforcement learning applied.")
-        return "reinforcement_status_ok"
+        # This function would normally trigger RL updates, e.g., policy gradient steps.
+        # Here we simply simulate a brief delay and return a status.
+        time.sleep(0.5)  # Simulate processing delay.
+        status = f"Reinforcement learning applied with parameters: {updated_params}"
+        logging.info(status)
+        return status
 
 class PerformanceLogger:
-    def log_performance(self, feedback):
+    def log(self, metrics):
         """
-        Log performance metrics based on feedback.
+        Log the performance metrics.
+        
+        Parameters:
+            metrics (dict): The performance metrics to log.
         """
-        # Placeholder: Log metrics to a file or monitoring system.
-        print("[PerformanceLogger] Performance logged.")
-        return "performance_logged"
+        logging.info("Performance metrics logged: %s", metrics)
 
-class FeedbackLoop:
-    def __init__(self):
-        self.feedback_collector = FeedbackCollector()
-        self.adaptive_updater = AdaptiveUpdater()
-        self.reinforcement_module = ReinforcementLearningModule()
-        self.performance_logger = PerformanceLogger()
-
-    def run(self, final_output):
-        """
-        Execute the complete feedback loop:
-          1. Collect feedback on the final output.
-          2. Update pipeline parameters adaptively.
-          3. Apply reinforcement learning updates.
-          4. Log performance metrics.
-        """
-        feedback = self.feedback_collector.collect(final_output)
-        self.adaptive_updater.update(feedback)
-        self.reinforcement_module.reinforce(feedback)
-        self.performance_logger.log_performance(feedback)
-        print("[FeedbackLoop] Feedback loop complete.")
-        return True
-
-# ----- Example Usage -----
-if __name__ == "__main__":
-    # Simulated final output from the Decision Aggregation module (Step 8).
-    final_output = ("synthesized(reasoning: reasoned(temporally_aligned({'context': 'fused_multimodal_data'}))\n"
-                    "planning: plan(temporally_aligned({'context': 'fused_multimodal_data'}))\n"
-                    "knowledge_retrieval: knowledge(temporally_aligned({'context': 'fused_multimodal_data'}))\n"
-                    "Evaluation: Verification: Outputs consistent. | Consensus: Majority agreement reached. | "
-                    "SelfMonitoring: Performance within acceptable limits. | Iteration: No further iteration required.)")
+def main():
+    """
+    Main function for the Feedback Loop & Continuous Learning module.
     
-    # Instantiate and run the feedback loop.
-    feedback_loop = FeedbackLoop()
-    feedback_loop.run(final_output)
+    Simulates the entire feedback loop:
+      1. Collect feedback.
+      2. Update system parameters.
+      3. Apply reinforcement learning updates.
+      4. Log performance metrics.
+    
+    Returns:
+        dict: A summary of the feedback loop execution.
+    """
+    logging.info(">> Step 9: Feedback Loop and Continuous Learning")
+    
+    collector = FeedbackCollector()
+    updater = AdaptiveUpdater()
+    rl_module = ReinforcementLearningModule()
+    perf_logger = PerformanceLogger()
+    
+    # Simulate feedback collection.
+    feedback = collector.collect()
+    
+    # Update parameters based on feedback.
+    updated_params = updater.update_parameters(feedback)
+    
+    # Apply reinforcement learning updates.
+    rl_status = rl_module.apply_rl(updated_params)
+    
+    # Log performance metrics.
+    perf_logger.log(feedback)
+    
+    summary = {
+        "feedback": feedback,
+        "updated_params": updated_params,
+        "rl_status": rl_status
+    }
+    print("Feedback Loop Summary:", summary)
+    return summary
+
+if __name__ == "__main__":
+    main()

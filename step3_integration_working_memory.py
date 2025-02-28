@@ -1,82 +1,99 @@
-#by Alexis Soto-Yanez
+# step3_integration_working_memory.py
+# by Alexis Soto-Yanez
 """
-Step 3: Integration and Working Memory for HMAS (AGI Prototype)
+Integration & Working Memory Module for HMAS Prototype
 
-This script demonstrates how to fuse multi-modal sensory outputs into a unified
-representation, buffer the result for context, and align the data temporally.
-The resulting working memory is then available to downstream processing modules.
+This module fuses outputs from the multi-sensory perception layer into a unified
+representation and stores it in a working memory buffer. In this example, we simulate
+the fusion using placeholder numeric arrays.
 """
 
-class FeatureFusion:
-    def fuse(self, features):
-        """
-        Fuse multi-modal features into a unified representation.
-        For simplicity, this example concatenates string representations of the features.
-        """
-        # Sorting keys for consistency in the fused output.
-        fused = " | ".join(str(features[key]) for key in sorted(features))
-        print("[FeatureFusion] Features fused.")
-        return fused
+import logging
+import numpy as np
+
+# Configure logging.
+logging.basicConfig(level=logging.INFO)
+
+def fuse_features(features_list):
+    """
+    Fuses a list of feature vectors by computing their element-wise average.
+    
+    Parameters:
+        features_list (list of np.array): List of numeric feature arrays.
+    
+    Returns:
+        np.array: The averaged (fused) feature vector.
+    """
+    try:
+        fused = np.mean(np.array(features_list), axis=0)
+    except Exception as e:
+        logging.error("Error fusing features: %s", e)
+        fused = None
+    return fused
 
 class ContextBuffer:
-    def buffer(self, fused_features):
-        """
-        Buffer the fused features to provide context for further processing.
-        """
-        buffered = {"context": fused_features}
-        print("[ContextBuffer] Fused features buffered.")
-        return buffered
-
-class TemporalAlignment:
-    def align(self, buffered_data):
-        """
-        Align the buffered data temporally.
-        In a real system, this might adjust timestamps or align sensor data.
-        """
-        aligned = f"temporally_aligned({buffered_data})"
-        print("[TemporalAlignment] Data temporally aligned.")
-        return aligned
-
-class IntegrationAndMemory:
+    """
+    A simple working memory buffer that stores the fused feature representation.
+    """
     def __init__(self):
-        self.feature_fusion = FeatureFusion()
-        self.context_buffer = ContextBuffer()
-        self.temporal_alignment = TemporalAlignment()
-        self.working_memory = {}
+        self.buffer = None
 
-    def run(self, perception_results):
+    def store(self, fused_features):
         """
-        Execute the integration pipeline:
-        1. Fuse features.
-        2. Buffer the fused features.
-        3. Perform temporal alignment.
-        4. Store the result in working memory.
+        Stores the fused features in the working memory.
+        
+        Parameters:
+            fused_features: The fused feature vector.
+        
+        Returns:
+            The stored feature vector.
         """
-        fused = self.feature_fusion.fuse(perception_results)
-        buffered = self.context_buffer.buffer(fused)
-        aligned = self.temporal_alignment.align(buffered)
-        self.working_memory['fused'] = aligned
-        print("[IntegrationAndMemory] Working memory updated.")
-        return self.working_memory
+        self.buffer = fused_features
+        return self.buffer
 
-# ----- Example Usage -----
+    def retrieve(self):
+        """
+        Retrieves the stored feature vector.
+        
+        Returns:
+            The stored feature vector.
+        """
+        return self.buffer
+
+def main():
+    """
+    Main function for the Integration & Working Memory module.
+    
+    Simulates the integration of multi-modal features produced by the perception layer.
+    Returns a dictionary containing the unified 'fused' representation.
+    """
+    logging.info(">> Step 3: Integration and Working Memory")
+    
+    # Simulate placeholder outputs from the perception module.
+    # In a real system, these would be derived from the outputs of step2.
+    vision = np.array([0.1, 0.2, 0.3])
+    audition = np.array([0.2, 0.3, 0.4])
+    smell = np.array([0.3, 0.4, 0.5])
+    touch = np.array([0.4, 0.5, 0.6])
+    taste = np.array([0.5, 0.6, 0.7])
+    
+    features_list = [vision, audition, smell, touch, taste]
+    fused_features = fuse_features(features_list)
+    
+    if fused_features is None:
+        logging.error("Fusing features failed.")
+        return {}
+    
+    logging.info("Fused features computed.")
+    
+    # Store the fused features in a working memory buffer.
+    context_buffer = ContextBuffer()
+    buffer_output = context_buffer.store(fused_features)
+    logging.info("Fused features stored in working memory.")
+    
+    # Return a dictionary representing the working memory.
+    return {"fused": buffer_output}
+
 if __name__ == "__main__":
-    # Simulated perception results from Step 2
-    # In practice, this would be the output from your multi-sensory perception module.
-    simulated_perception_results = {
-        "vision": {"color": "color_processing_result", "motion": "motion_detection_result", "depth": "depth_estimation_result"},
-        "audition": {"frequency": "frequency_analysis_result", "localization": "sound_localization_result", "voice": "voice_recognition_result"},
-        "smell": {"odor": "odor_detection_result", "intensity": "intensity_analysis_result"},
-        "touch": {"pressure": "pressure_sensing_result", "temperature": "temperature_detection_result", "texture": "texture_discrimination_result", "vibration": "vibration_analysis_result", "pressure_map": "pressure_mapping_result"},
-        "taste": {"composition": "chemical_composition_analysis_result", "threshold": "threshold_detection_result"}
-    }
-    
-    # Create the integration and memory module.
-    integration_memory = IntegrationAndMemory()
-    
-    # Run the integration process with the simulated perception results.
-    working_memory = integration_memory.run(simulated_perception_results)
-    
-    # Print the working memory content.
-    print("\nWorking Memory Contents:")
-    print(working_memory)
+    output = main()
+    print("Integration Output:", output)
