@@ -3,10 +3,12 @@
 """
 Feedback Loop & Continuous Learning Module for HMAS Prototype
 
-This module simulates the collection of performance data and feedback from previous
-pipeline stages. It then updates system parameters based on the feedback and logs
-the performance for continuous learning. This simplified implementation is intended
-to serve as a placeholder for more advanced reinforcement learning and adaptive updating.
+This module collects performance and communication metrics from the pipeline,
+updates system parameters accordingly, and applies reinforcement learning (RL)
+updates to improve overall system performance. This enhanced version includes:
+  - Expanded metric collection (accuracy, latency, error_rate, plus communication metrics).
+  - Adaptive updating that factors in communication performance.
+  - A simulated RL update process.
 """
 
 import logging
@@ -19,36 +21,51 @@ logging.basicConfig(level=logging.INFO)
 class FeedbackCollector:
     def collect(self):
         """
-        Simulate the collection of feedback from the pipeline's output.
+        Simulate collection of feedback metrics from various pipeline stages.
         
         Returns:
-            dict: A dictionary with simulated performance metrics.
+            dict: A dictionary with performance metrics and communication-specific metrics.
         """
-        # In a real system, feedback might come from sensors, user input, or automated metrics.
-        feedback = {
-            "accuracy": random.uniform(0.8, 1.0),
-            "latency": random.uniform(0.1, 0.5),
-            "error_rate": random.uniform(0.0, 0.05)
+        # Simulated performance metrics.
+        performance_metrics = {
+            "accuracy": round(random.uniform(0.85, 0.95), 3),
+            "latency": round(random.uniform(0.2, 0.5), 3),
+            "error_rate": round(random.uniform(0.02, 0.05), 3)
         }
+        # Simulated communication metrics.
+        communication_metrics = {
+            "message_latency": round(random.uniform(0.1, 0.5), 3),
+            "message_success_rate": round(random.uniform(0.8, 1.0), 3),
+            "negotiation_time": round(random.uniform(0.05, 0.2), 3)
+        }
+        # Combine metrics.
+        feedback = {**performance_metrics, **{"comm_" + k: v for k, v in communication_metrics.items()}}
         logging.info("Feedback collected: %s", feedback)
         return feedback
 
 class AdaptiveUpdater:
     def update_parameters(self, feedback):
         """
-        Simulate updating system parameters based on collected feedback.
+        Updates system parameters based on feedback, including both performance
+        and communication metrics.
         
         Parameters:
             feedback (dict): Feedback metrics.
         
         Returns:
-            dict: Updated parameters (dummy values for demonstration).
+            dict: Updated parameters.
         """
-        # In a real implementation, use feedback to adjust hyperparameters, model weights, etc.
+        # Update learning rate based on error_rate.
+        lr = 0.001 * (1 - feedback["error_rate"])
+        # Adjust batch size based on accuracy.
+        batch_size = max(16, int(32 * feedback["accuracy"]))
+        # Adjust update frequency based on latency and communication negotiation time.
+        update_frequency = max(1, int(10 * (feedback["latency"] + feedback["comm_negotiation_time"]) / 2))
+        
         updated_params = {
-            "learning_rate": 0.001 * (1 - feedback["error_rate"]),
-            "batch_size": int(32 * feedback["accuracy"]),
-            "update_frequency": max(1, int(10 * feedback["latency"]))
+            "learning_rate": lr,
+            "batch_size": batch_size,
+            "update_frequency": update_frequency
         }
         logging.info("System parameters updated based on feedback: %s", updated_params)
         return updated_params
@@ -56,17 +73,16 @@ class AdaptiveUpdater:
 class ReinforcementLearningModule:
     def apply_rl(self, updated_params):
         """
-        Simulate applying reinforcement learning based on updated parameters.
+        Simulate applying reinforcement learning updates based on updated parameters.
         
         Parameters:
-            updated_params (dict): Parameters updated from feedback.
+            updated_params (dict): Updated parameters from feedback.
         
         Returns:
-            str: A status message.
+            str: A status message indicating the RL update.
         """
-        # This function would normally trigger RL updates, e.g., policy gradient steps.
-        # Here we simply simulate a brief delay and return a status.
-        time.sleep(0.5)  # Simulate processing delay.
+        # Simulate processing delay.
+        time.sleep(0.5)
         status = f"Reinforcement learning applied with parameters: {updated_params}"
         logging.info(status)
         return status
@@ -74,10 +90,10 @@ class ReinforcementLearningModule:
 class PerformanceLogger:
     def log(self, metrics):
         """
-        Log the performance metrics.
+        Log performance and communication metrics.
         
         Parameters:
-            metrics (dict): The performance metrics to log.
+            metrics (dict): The metrics to log.
         """
         logging.info("Performance metrics logged: %s", metrics)
 
@@ -85,12 +101,12 @@ def main():
     """
     Main function for the Feedback Loop & Continuous Learning module.
     
-    Simulates the entire feedback loop:
-      1. Collect feedback.
-      2. Update system parameters.
-      3. Apply reinforcement learning updates.
-      4. Log performance metrics.
-    
+    Performs the following:
+      1. Collects feedback metrics (performance and communication).
+      2. Updates system parameters based on feedback.
+      3. Applies reinforcement learning updates.
+      4. Logs the performance metrics.
+      
     Returns:
         dict: A summary of the feedback loop execution.
     """
@@ -101,16 +117,16 @@ def main():
     rl_module = ReinforcementLearningModule()
     perf_logger = PerformanceLogger()
     
-    # Simulate feedback collection.
+    # Step 1: Collect metrics.
     feedback = collector.collect()
     
-    # Update parameters based on feedback.
+    # Step 2: Update parameters.
     updated_params = updater.update_parameters(feedback)
     
-    # Apply reinforcement learning updates.
+    # Step 3: Apply RL updates.
     rl_status = rl_module.apply_rl(updated_params)
     
-    # Log performance metrics.
+    # Step 4: Log the performance metrics.
     perf_logger.log(feedback)
     
     summary = {

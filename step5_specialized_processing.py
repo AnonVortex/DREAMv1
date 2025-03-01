@@ -19,6 +19,12 @@ from graph_rl.graph_rl_agent import GraphRLAgentWrapper
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
+from communication.comm_optimization import CommunicationOptimizer
+
+comm_optimizer = CommunicationOptimizer()
+comm_optimizer.collect_metrics({"message_latency": 0.2, "message_success_rate": 0.9})
+chosen_strategy = comm_optimizer.optimize_communication()
+
 class LanguageReasoningAgent:
     def process(self, context):
         logging.info("LanguageReasoningAgent processing context...")
