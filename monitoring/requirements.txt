@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+redis
+slowapi
+prometheus-fastapi-instrumentator
+pydantic
+psutil
+pytest

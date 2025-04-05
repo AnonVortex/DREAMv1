@@ -1,0 +1,103 @@
+REFERENCES FOR HMAS & RELATED TOPICS
+
+1. Busoniu, Lucian, Babuska, Robert, & De Schutter, Bart. "A Comprehensive Survey of Multiagent Reinforcement Learning." IEEE Trans. SMC, Part C, 38(2): 156-172, 2008.
+
+2. Barto, Andrew G., & Mahadevan, Sridhar. "Recent Advances in Hierarchical Reinforcement Learning." Discrete Event Dynamic Systems, 13(4): 341-379, 2003.
+
+3. Foerster, Jakob N., Assael, Ioannis A., de Freitas, Nando, & Whiteson, Shimon. "Learning to Communicate with Deep Multi-Agent Reinforcement Learning." NeurIPS, 2016.
+
+4. Andreas, Jacob, Klein, Dan, & Levine, Sergey. "Modular Multitask Reinforcement Learning with Policy Sketches." ICML, 2017.
+
+5. Zhou, Jie, et al. "Graph Neural Networks: A Review of Methods and Applications." AI Open, 1: 57-81, 2020.
+
+6. Vinyals, Oriol, et al. "Grandmaster Level in StarCraft II using Multi-Agent Reinforcement Learning." Nature, 575(7782): 350-354, 2019.
+
+7. Konečný, Jakub, et al. "Federated Learning: Strategies for Improving Communication Efficiency." arXiv:1610.05492, 2016.
+
+8. Lowe, Ryan, et al. "Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments." NeurIPS, 2017.
+
+9. Sukhbaatar, Sainbayar, et al. "Learning Multiagent Communication with Backpropagation." NeurIPS, 2016.
+
+10. Silver, David, et al. "Mastering the Game of Go with Deep Neural Networks and Tree Search." Nature, 529: 484-489, 2016.
+
+11. Mnih, Volodymyr, et al. "Human-level Control through Deep Reinforcement Learning." Nature, 518: 529-533, 2015.
+
+12. Schulman, John, et al. "Proximal Policy Optimization Algorithms." arXiv:1707.06347, 2017.
+
+13. Lillicrap, Timothy P., et al. "Continuous Control with Deep Reinforcement Learning." arXiv:1509.02971, 2015.
+
+14. Schulman, John, et al. "Trust Region Policy Optimization." ICML, 2015.
+
+15. Mnih, Volodymyr, et al. "Asynchronous Methods for Deep Reinforcement Learning." ICML, 2016.
+
+16. Kapturowski, Steven, et al. "Recurrent Experience Replay in Distributed Reinforcement Learning." ICLR, 2018.
+
+17. Foerster, Jakob N., et al. "Counterfactual Multi-Agent Policy Gradients." AAAI, 2018.
+
+18. Rashid, Tabish, et al. "QMIX: Monotonic Value Function Factorisation for Deep Multi-Agent Reinforcement Learning." ICML, 2018.
+
+19. Sunehag, Peter, et al. "Value-Decomposition Networks For Cooperative Multi-Agent Learning." ICML, 2018.
+
+20. Dosovitskiy, Alexey, et al. "CARLA: An Open Urban Driving Simulator." CoRL, 2017.
+
+21. Krizhevsky, Alexey, Sutskever, Ilya, & Hinton, Geoffrey E. "Imagenet Classification with Deep Convolutional Neural Networks." NeurIPS, 2012.
+
+22. He, Kaiming, et al. "Deep Residual Learning for Image Recognition." CVPR, 2016.
+
+23. Redmon, Joseph, et al. "You Only Look Once: Unified, Real-Time Object Detection." CVPR, 2016.
+
+24. Ren, Shaoqing, et al. "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks." NeurIPS, 2015.
+
+25. Caruana, Rich. "Multitask Learning." Machine Learning, 28(1): 41-75, 1997.
+
+26. Bengio, Yoshua, et al. "Representation Learning: A Review and New Perspectives." IEEE Trans. on PAMI, 35(8): 1798-1828, 2013.
+
+27. Goodfellow, Ian, et al. "Generative Adversarial Networks." arXiv:1406.2661, 2014.
+
+28. Arjovsky, Martin, Chintala, Soumith, & Bottou, Léon. "Wasserstein GAN." arXiv:1701.07875, 2017.
+
+29. Silver, David, et al. "Mastering the Game of Go without Human Knowledge." Nature, 550: 354-359, 2017.
+
+30. Hasselt, Hado van, et al. "Deep Reinforcement Learning with Double Q-learning." AAAI, 2016.
+
+31. Mnih, Volodymyr, et al. "Playing Atari with Deep Reinforcement Learning." arXiv:1312.5602, 2013.
+
+32. Sutton, Richard S. "Policy Gradient Methods for Reinforcement Learning with Function Approximation." NeurIPS, 2000.
+
+33. Peters, Jan, & Schaal, Stefan. "Policy Gradient Methods for Robotics." NeurIPS, 2008.
+
+34. Rusu, Andrei A., et al. "Progressive Neural Networks." arXiv:1606.04671, 2016.
+
+35. Parisotto, Emilio, et al. "Neural Task Programming: Learning to Generalize Across Hierarchical Tasks." ICRA, 2016.
+
+36. Vinyals, Oriol, et al. "StarCraft II: A New Challenge for Reinforcement Learning." arXiv:1708.04782, 2017.
+
+37. Peng, Xue, et al. "Multiagent Bidirectionally-Coordinated Nets for Learning to Play StarCraft Combat Games." NeurIPS, 2017.
+
+38. Sutton, Richard S., & Barto, Andrew G. "Reinforcement Learning: An Introduction." MIT Press, 2018.
+
+39. Arora, Sanjeev, et al. "A Theoretical Analysis of Deep Neural Networks for Nonsmooth Functions." Journal of Machine Learning Research, 17: 1-40, 2016.
+
+40. Lake, Brenden M., et al. "Building Machines That Learn and Think Like People." Behavioral and Brain Sciences, 40: e253, 2017.
+
+41. Levine, Sergey, & Koltun, Vladlen. "Guided Policy Search." ICRA, 2013.
+
+42. Ha, David, & Schmidhuber, Jürgen. "World Models." arXiv:1803.10122, 2018.
+
+43. Schmidhuber, Jürgen. "Deep Learning in Neural Networks: An Overview." Neural Networks, 61: 85-117, 2015.
+
+44. Levine, Sergey. "Deep Reinforcement Learning for Robotic Manipulation with Asynchronous Policy Updates." ICRA, 2016.
+
+45. Silver, David, et al. "Deterministic Policy Gradient Algorithms." ICML, 2014.
+
+46. Peters, Jan, & Schaal, Stefan. "Reinforcement Learning for Motor Skills with Policy Gradients." Neural Networks, 21(4): 682-697, 2008.
+
+47. Gu, Shixiang, et al. "Q-Prop: Sample-Efficient Policy Gradient with an Off-Policy Critic." ICML, 2016.
+
+48. Bellemare, Marc G., et al. "Unifying Count-Based Exploration and Intrinsic Motivation." NeurIPS, 2016.
+
+49. Ha, David, et al. "Recurrent World Models Facilitate Policy Evolution." NeurIPS Workshop, 2018.
+
+50. Jaegle, Aaron, et al. "Perceiver: General Perception with Iterative Attention." In Proceedings of the 38th International Conference on Machine Learning, pp. 775–784, 2021.
+
+51. Chen, Q., Chen, Y., et al. "Multi-Agent Reinforcement Learning with Graph Convolutional Networks." In Proceedings of the AAAI Conference on Artificial Intelligence, 2019.

@@ -1,8 +1,7 @@
 import os
 import logging.config
 from contextlib import asynccontextmanager
-
-import random
+from typing import Any, Dict
 
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
@@ -20,7 +19,6 @@ load_dotenv()
 # Import configuration from local config.py
 from .config import settings
 
-# Load logging configuration if available
 LOGGING_CONFIG_PATH = "logging.conf"
 if os.path.exists(LOGGING_CONFIG_PATH):
     logging.config.fileConfig(LOGGING_CONFIG_PATH, disable_existing_loggers=False)
@@ -28,42 +26,29 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("[CommOptimization] Starting up Communication Optimization Module...")
+    logger.info("[Feedback] Starting up Feedback Module...")
+    # Startup logic: connect to services, initialize models, etc.
     yield
-    logger.info("[CommOptimization] Shutting down Communication Optimization Module...")
+    logger.info("[Feedback] Shutting down Feedback Module...")
 
 app = FastAPI(
-    title="HMAS Communication Optimization Module",
+    title="HMAS Feedback Module",
     version="1.0.0",
     lifespan=lifespan
 )
 
-# Setup Redis client for readiness check (if needed)
+# Setup Redis client for readiness check if needed
 redis_client = redis.Redis.from_url(settings.REDIS_URL, decode_responses=True)
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["10/minute"])
 app.state.limiter = limiter
 
-# Prometheus metrics
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
-
-# Middleware
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 
-# Pydantic model for input (expandable if needed)
-class CommInput(BaseModel):
-    # For now, no fields required; this endpoint can be triggered without payload
-    pass
-
-def optimize_communication():
-    logger.info("[CommOptimization] Optimizing inter-agent communication...")
-    metrics = {
-        "message_latency": round(random.uniform(0.15, 0.3), 3),
-        "message_success_rate": round(random.uniform(0.8, 0.95), 3)
-    }
-    strategy = random.choice(["broadcast", "unicast", "gossip"])
-    logger.info(f"[CommOptimization] Chosen strategy: {strategy}")
-    return {"metrics": metrics, "strategy": strategy}
+# Pydantic model for feedback input
+class FeedbackInput(BaseModel):
+    final_decision: str
 
 @app.get("/health")
 async def health_check():
@@ -75,18 +60,32 @@ async def ready_check():
         await redis_client.ping()
         return {"status": "ready"}
     except Exception as e:
-        logger.warning(f"[CommOptimization] Redis not ready: {e}")
+        logger.warning(f"[Feedback] Redis not ready: {e}")
         raise HTTPException(status_code=500, detail="Redis not ready")
 
-@app.post("/optimize")
+@app.post("/feedback")
 @limiter.limit("10/minute")
-async def optimize_endpoint(request: Request, input_data: CommInput = None):
-    """
-    Endpoint to trigger communication optimization.
-    Returns the chosen communication strategy and performance metrics.
-    """
-    result = optimize_communication()
-    return result
+async def get_feedback(request: Request, input_data: FeedbackInput):
+    logger.info(f"[Feedback] Received final decision: {input_data.final_decision}")
+    
+    # Feedback logic: stubbed for now
+    metrics = {
+        "accuracy": round(0.85 + 0.1 * 0.5, 3),  # example: random-ish fixed value
+        "latency": round(0.2 + 0.3 * 0.5, 3),
+        "error_rate": round(0.01 + 0.04 * 0.5, 3)
+    }
+    updated_params = {
+        "learning_rate": round(0.0009 + 0.0001 * 0.5, 6),
+        "batch_size": 24,  # example value
+        "update_frequency": 3  # example value
+    }
+    summary = {
+        "feedback": metrics,
+        "updated_params": updated_params
+    }
+    
+    logger.info(f"[Feedback] Summary: {summary}")
+    return summary
 
 if __name__ == "__main__":
-    uvicorn.run("comm_optimization:app", host="0.0.0.0", port=8900, reload=True)
+    uvicorn.run("feedback_main:app", host="0.0.0.0", port=8600, reload=True)

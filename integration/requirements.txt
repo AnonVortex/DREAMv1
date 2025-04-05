@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+redis
+slowapi
+prometheus-fastapi-instrumentator
+pydantic
+aiofiles  # If you need asynchronous file ops, optional here
+pytest

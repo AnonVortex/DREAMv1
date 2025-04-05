@@ -1,10 +1,10 @@
 import os
 import logging.config
 from contextlib import asynccontextmanager
-
-import random
+from typing import Any, Dict, List, Tuple
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -20,7 +20,6 @@ load_dotenv()
 # Import configuration from local config.py
 from .config import settings
 
-# Load logging configuration if available
 LOGGING_CONFIG_PATH = "logging.conf"
 if os.path.exists(LOGGING_CONFIG_PATH):
     logging.config.fileConfig(LOGGING_CONFIG_PATH, disable_existing_loggers=False)
@@ -28,42 +27,33 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("[CommOptimization] Starting up Communication Optimization Module...")
+    logger.info("[Memory] Starting up Memory Module...")
+    # Startup logic: e.g., connect to databases, initialize cache, etc.
     yield
-    logger.info("[CommOptimization] Shutting down Communication Optimization Module...")
+    logger.info("[Memory] Shutting down Memory Module...")
 
 app = FastAPI(
-    title="HMAS Communication Optimization Module",
+    title="HMAS Memory Module",
     version="1.0.0",
     lifespan=lifespan
 )
 
-# Setup Redis client for readiness check (if needed)
+# Redis client for potential caching (if needed)
 redis_client = redis.Redis.from_url(settings.REDIS_URL, decode_responses=True)
 
+# Rate limiting
 limiter = Limiter(key_func=get_remote_address, default_limits=["10/minute"])
 app.state.limiter = limiter
 
-# Prometheus metrics
+# Prometheus monitoring
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 # Middleware
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 
-# Pydantic model for input (expandable if needed)
-class CommInput(BaseModel):
-    # For now, no fields required; this endpoint can be triggered without payload
-    pass
-
-def optimize_communication():
-    logger.info("[CommOptimization] Optimizing inter-agent communication...")
-    metrics = {
-        "message_latency": round(random.uniform(0.15, 0.3), 3),
-        "message_success_rate": round(random.uniform(0.8, 0.95), 3)
-    }
-    strategy = random.choice(["broadcast", "unicast", "gossip"])
-    logger.info(f"[CommOptimization] Chosen strategy: {strategy}")
-    return {"metrics": metrics, "strategy": strategy}
+# Define Pydantic model for Memory input (Meta output)
+class MemoryInput(BaseModel):
+    meta_output: Dict[str, Any]
 
 @app.get("/health")
 async def health_check():
@@ -75,18 +65,23 @@ async def ready_check():
         await redis_client.ping()
         return {"status": "ready"}
     except Exception as e:
-        logger.warning(f"[CommOptimization] Redis not ready: {e}")
+        logger.warning(f"[Memory] Redis not ready: {e}")
         raise HTTPException(status_code=500, detail="Redis not ready")
 
-@app.post("/optimize")
+@app.post("/memory")
 @limiter.limit("10/minute")
-async def optimize_endpoint(request: Request, input_data: CommInput = None):
-    """
-    Endpoint to trigger communication optimization.
-    Returns the chosen communication strategy and performance metrics.
-    """
-    result = optimize_communication()
-    return result
+async def archive_memory(request: Request, input_data: MemoryInput):
+    logger.info(f"[Memory] Received meta output: {input_data.meta_output}")
+
+    # Archive the meta output (stub implementation)
+    archive: List[Dict[str, Any]] = [{"stage": "meta", "evaluation": input_data.meta_output}]
+    logger.info(f"[Memory] Archive size: {len(archive)}")
+    
+    # Retrieve the latest archived record (for demonstration)
+    query_result = archive[-1] if archive else None
+    logger.info(f"[Memory] Query result: {query_result}")
+    
+    return {"archive": archive, "query_result": query_result}
 
 if __name__ == "__main__":
-    uvicorn.run("comm_optimization:app", host="0.0.0.0", port=8900, reload=True)
+    uvicorn.run("memory_main:app", host="0.0.0.0", port=8401, reload=True)
