@@ -1,7 +1,7 @@
-# HMAS Whitepaper
+# DREAMv1 Whitepaper
 
 ## Abstract
-The Hierarchical Multi-Agent System (HMAS) represents a novel approach to Artificial General Intelligence (AGI) through a modular, scalable architecture that combines specialized AI agents with advanced reasoning and learning capabilities. This system is designed to process multi-modal inputs, maintain contextual memory, and adapt through continuous feedback and learning.
+The Hierarchical Multi-Agent System (DREAMv1) represents a novel approach to Artificial General Intelligence (AGI) through a modular, scalable architecture that combines specialized AI agents with advanced reasoning and learning capabilities. This system is designed to process multi-modal inputs, maintain contextual memory, and adapt through continuous feedback and learning.
 
 ## Introduction & Motivation
 - **Challenge**: Current AI systems often excel in narrow domains but struggle with general intelligence tasks requiring multi-modal understanding and adaptive reasoning.
