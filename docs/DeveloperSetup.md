@@ -1,4 +1,4 @@
-# HMAS Developer Setup Guide
+# DREAMv1 Developer Setup Guide
 
 ## Overview
 This document provides comprehensive setup instructions for developers working on the HMAS (Hierarchical Multi-Agent System) AGI prototype.
