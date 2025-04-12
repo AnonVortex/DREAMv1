@@ -1,4 +1,4 @@
-# HMAS Deployment Guide
+# Deployment Guide
 
 ## Overview
 
