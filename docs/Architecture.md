@@ -1,4 +1,4 @@
-# HMAS Architecture Documentation
+# DREAMv1 Architecture Documentation
 
 ## License
 
