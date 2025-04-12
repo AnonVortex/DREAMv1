@@ -27,8 +27,8 @@ The system consists of the following core modules:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/YourUsername/hmas-prototype.git
-   cd hmas-prototype
+   git clone https://github.com/AnonVortex/DREAMv1.git
+   cd DREAMv1
    ```
 
 2. **Set Up Virtual Environment**
