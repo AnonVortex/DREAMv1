@@ -1,4 +1,4 @@
-# HMAS Changelog
+# Changelog
 
 ## License
 
