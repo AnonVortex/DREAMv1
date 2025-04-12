@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: perception-service
+  namespace: hmas
+spec:
+  selector:
+    app: perception-service
+  ports:
+  - port: 8100
+    targetPort: 8100
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memory-service
+  namespace: hmas
+spec:
+  selector:
+    app: memory-service
+  ports:
+  - port: 8200
+    targetPort: 8200
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learning-service
+  namespace: hmas
+spec:
+  selector:
+    app: learning-service
+  ports:
+  - port: 8300
+    targetPort: 8300
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reasoning-service
+  namespace: hmas
+spec:
+  selector:
+    app: reasoning-service
+  ports:
+  - port: 8400
+    targetPort: 8400
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: communication-service
+  namespace: hmas
+spec:
+  selector:
+    app: communication-service
+  ports:
+  - port: 8500
+    targetPort: 8500
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: feedback-service
+  namespace: hmas
+spec:
+  selector:
+    app: feedback-service
+  ports:
+  - port: 8600
+    targetPort: 8600
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: integration-service
+  namespace: hmas
+spec:
+  selector:
+    app: integration-service
+  ports:
+  - port: 8700
+    targetPort: 8700
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+  namespace: hmas
+spec:
+  selector:
+    app: mongodb
+  ports:
+  - port: 27017
+    targetPort: 27017
+    name: mongodb
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: hmas
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+    name: redis
+  type: ClusterIP 

@@ -1,0 +1,140 @@
+name: Backup
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Run daily at 2 AM UTC
+  workflow_dispatch:      # Allow manual triggers
+
+env:
+  BACKUP_BUCKET: ${{ secrets.BACKUP_BUCKET }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Set up kubeconfig
+      uses: azure/k8s-set-context@v3
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+        context: production-context
+
+    - name: Install Velero
+      run: |
+        wget https://github.com/vmware-tanzu/velero/releases/download/v1.11.0/velero-v1.11.0-linux-amd64.tar.gz
+        tar -xvf velero-v1.11.0-linux-amd64.tar.gz
+        sudo mv velero-v1.11.0-linux-amd64/velero /usr/local/bin/
+        rm -rf velero-v1.11.0-linux-amd64*
+
+    - name: Backup Kubernetes Resources
+      run: |
+        # Create backup name with timestamp
+        BACKUP_NAME="hmas-backup-$(date +%Y%m%d-%H%M%S)"
+        
+        # Create full cluster backup using Velero
+        velero backup create $BACKUP_NAME \
+          --include-namespaces hmas \
+          --wait
+
+        # Wait for backup completion
+        velero backup wait $BACKUP_NAME
+
+    - name: Backup MongoDB
+      run: |
+        # Get MongoDB pod name
+        MONGO_POD=$(kubectl get pod -n hmas -l app=mongodb -o jsonpath="{.items[0].metadata.name}")
+        
+        # Create backup directory
+        BACKUP_DIR="/tmp/mongodb-backup"
+        mkdir -p $BACKUP_DIR
+        
+        # Run mongodump inside the pod
+        kubectl exec -n hmas $MONGO_POD -- mongodump \
+          --username=${{ secrets.MONGODB_USERNAME }} \
+          --password=${{ secrets.MONGODB_PASSWORD }} \
+          --out=/tmp/backup
+        
+        # Copy backup files from pod
+        kubectl cp hmas/$MONGO_POD:/tmp/backup $BACKUP_DIR
+        
+        # Compress backup
+        tar -czf mongodb-backup.tar.gz -C $BACKUP_DIR .
+        
+        # Upload to S3
+        aws s3 cp mongodb-backup.tar.gz s3://${{ env.BACKUP_BUCKET }}/mongodb/mongodb-backup-$(date +%Y%m%d-%H%M%S).tar.gz
+
+    - name: Backup Redis
+      run: |
+        # Get Redis pod name
+        REDIS_POD=$(kubectl get pod -n hmas -l app=redis -o jsonpath="{.items[0].metadata.name}")
+        
+        # Trigger Redis backup
+        kubectl exec -n hmas $REDIS_POD -- redis-cli -a ${{ secrets.REDIS_PASSWORD }} SAVE
+        
+        # Copy dump.rdb
+        kubectl cp hmas/$REDIS_POD:/data/dump.rdb redis-backup.rdb
+        
+        # Upload to S3
+        aws s3 cp redis-backup.rdb s3://${{ env.BACKUP_BUCKET }}/redis/redis-backup-$(date +%Y%m%d-%H%M%S).rdb
+
+    - name: Backup Configurations
+      run: |
+        # Create config backup directory
+        mkdir -p config-backup
+        
+        # Export all ConfigMaps and Secrets
+        kubectl get configmap -n hmas -o yaml > config-backup/configmaps.yaml
+        kubectl get secret -n hmas -o yaml > config-backup/secrets.yaml
+        
+        # Export all custom resources
+        kubectl get all -n hmas -o yaml > config-backup/resources.yaml
+        
+        # Compress configs
+        tar -czf config-backup.tar.gz config-backup/
+        
+        # Upload to S3
+        aws s3 cp config-backup.tar.gz s3://${{ env.BACKUP_BUCKET }}/configs/config-backup-$(date +%Y%m%d-%H%M%S).tar.gz
+
+    - name: Cleanup old backups
+      run: |
+        # Keep last 30 days of backups
+        aws s3 ls s3://${{ env.BACKUP_BUCKET }}/mongodb/ | sort | head -n -30 | awk '{print $4}' | xargs -I {} aws s3 rm s3://${{ env.BACKUP_BUCKET }}/mongodb/{}
+        aws s3 ls s3://${{ env.BACKUP_BUCKET }}/redis/ | sort | head -n -30 | awk '{print $4}' | xargs -I {} aws s3 rm s3://${{ env.BACKUP_BUCKET }}/redis/{}
+        aws s3 ls s3://${{ env.BACKUP_BUCKET }}/configs/ | sort | head -n -30 | awk '{print $4}' | xargs -I {} aws s3 rm s3://${{ env.BACKUP_BUCKET }}/configs/{}
+
+    - name: Verify backups
+      run: |
+        # List latest backups
+        echo "Latest Velero backup:"
+        velero backup get | tail -n 1
+        
+        echo "Latest MongoDB backup:"
+        aws s3 ls s3://${{ env.BACKUP_BUCKET }}/mongodb/ | tail -n 1
+        
+        echo "Latest Redis backup:"
+        aws s3 ls s3://${{ env.BACKUP_BUCKET }}/redis/ | tail -n 1
+        
+        echo "Latest Config backup:"
+        aws s3 ls s3://${{ env.BACKUP_BUCKET }}/configs/ | tail -n 1
+
+    - name: Notify on Slack
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+        text: "Backup Status: ${{ job.status }}\nBackup Location: s3://${{ env.BACKUP_BUCKET }}"
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 

@@ -1,0 +1,21 @@
+{
+  "default": true,
+  "MD003": { "style": "atx" },
+  "MD004": { "style": "dash" },
+  "MD007": { "indent": 4 },
+  "MD013": {
+    "line_length": 120,
+    "code_blocks": false,
+    "tables": false
+  },
+  "MD024": { "allow_different_nesting": true },
+  "MD025": { "front_matter_title": "" },
+  "MD026": { "punctuation": ".,;:!" },
+  "MD029": { "style": "ordered" },
+  "MD033": { "allowed_elements": ["br"] },
+  "MD034": { "allow_raw_html": true },
+  "MD036": { "punctuation": ".,;:!" },
+  "MD040": { "allowed_languages": ["python", "bash", "json", "yaml", "toml"] },
+  "MD041": { "level": 1 },
+  "MD046": { "style": "fenced" }
+} 

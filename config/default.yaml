@@ -1,0 +1,63 @@
+# Default configuration for HMAS services
+
+# Environment settings
+debug: false
+testing: false
+host: "0.0.0.0"
+port: 8000
+base_url: "http://localhost:8000"
+
+# Database configuration
+database:
+  host: "localhost"
+  port: 27017
+  username: "admin"
+  database: "hmas"
+  max_connections: 10
+  timeout: 30.0
+  ssl_enabled: false
+
+# Redis configuration
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  ssl_enabled: false
+
+# Security configuration
+security:
+  token_expiry: 3600
+  allowed_origins:
+    - "http://localhost:3000"
+    - "http://localhost:8000"
+  ssl_enabled: false
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  rotate_size: 10485760  # 10MB
+  rotate_count: 5
+  json_format: false
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  prometheus_enabled: false
+  metrics_port: 9090
+  health_check_interval: 30
+  tracing_enabled: false
+  tracing_sample_rate: 0.1
+
+# Resource limits
+resource_limits:
+  cpu_limit: "1"
+  memory_limit: "1Gi"
+  storage_limit: "10Gi"
+  max_workers: 4
+  request_timeout: 30
+
+# Directories
+temp_dir: "/tmp"
+data_dir: "/data"
+config_dir: "/config" 

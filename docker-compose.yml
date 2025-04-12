@@ -1,167 +1,101 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  ingestion:
+  app:
     build:
-      context: ./ingestion
+      context: .
       dockerfile: Dockerfile
-    container_name: hmas_ingestion
+    volumes:
+      - .:/app
+    environment:
+      - APP_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/hmas
+      - REDIS_URL=redis://redis:6379/0
+      - MESSAGE_BROKER_HOST=rabbitmq
+      - MESSAGE_BROKER_PORT=5672
+      - MESSAGE_BROKER_USER=guest
+      - MESSAGE_BROKER_PASSWORD=guest
+      - MESSAGE_BROKER_VHOST=/
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
     ports:
       - "8000:8000"
     networks:
-      - hmas_network
+      - hmas-network
 
-  perception:
-    build:
-      context: ./perception
-      dockerfile: Dockerfile
-    container_name: hmas_perception
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=hmas
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - "8100:8100"
+      - "5432:5432"
+    networks:
+      - hmas-network
+
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - hmas-network
+
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - hmas-network
+
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    networks:
+      - hmas-network
+
+  grafana:
+    image: grafana/grafana:10.0.0
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
     depends_on:
-      - ingestion
+      - prometheus
     networks:
-      - hmas_network
+      - hmas-network
 
-  integration:
-    build:
-      context: ./integration
-      dockerfile: Dockerfile
-    container_name: hmas_integration
-    ports:
-      - "8200:8200"
-    depends_on:
-      - perception
-    networks:
-      - hmas_network
-
-  routing:
-    build:
-      context: ./routing
-      dockerfile: Dockerfile
-    container_name: hmas_routing
-    ports:
-      - "8300:8300"
-    depends_on:
-      - integration
-    networks:
-      - hmas_network
-
-  specialized:
-    build:
-      context: ./specialized
-      dockerfile: Dockerfile
-    container_name: hmas_specialized
-    ports:
-      - "8400:8400"
-    depends_on:
-      - routing
-    networks:
-      - hmas_network
-
-  meta:
-    build:
-      context: ./meta
-      dockerfile: Dockerfile
-    container_name: hmas_meta
-    ports:
-      - "8301:8301"   # Meta now runs on port 8301
-    depends_on:
-      - specialized
-    networks:
-      - hmas_network
-
-  memory:
-    build:
-      context: ./memory
-      dockerfile: Dockerfile
-    container_name: hmas_memory
-    ports:
-      - "8401:8401"
-    depends_on:
-      - meta
-    networks:
-      - hmas_network
-
-  aggregation:
-    build:
-      context: ./aggregation
-      dockerfile: Dockerfile
-    container_name: hmas_aggregation
-    ports:
-      - "8500:8500"
-    depends_on:
-      - memory
-    networks:
-      - hmas_network
-
-  feedback:
-    build:
-      context: ./feedback
-      dockerfile: Dockerfile
-    container_name: hmas_feedback
-    ports:
-      - "8600:8600"
-    depends_on:
-      - aggregation
-    networks:
-      - hmas_network
-
-  monitoring:
-    build:
-      context: ./monitoring
-      dockerfile: Dockerfile
-    container_name: hmas_monitoring
-    ports:
-      - "8700:8700"
-    depends_on:
-      - feedback
-    networks:
-      - hmas_network
-
-  graph_rl:
-    build:
-      context: ./graph_rl
-      dockerfile: Dockerfile
-    container_name: hmas_graph_rl
-    ports:
-      - "8800:8800"
-    networks:
-      - hmas_network
-
-  comm_optimization:
-    build:
-      context: ./communication
-      dockerfile: Dockerfile
-    container_name: hmas_comm_optimization
-    ports:
-      - "8900:8900"
-    networks:
-      - hmas_network
-
-  pipeline:
-    build:
-      context: ./pipelines
-      dockerfile: Dockerfile
-    container_name: hmas_pipeline
-    ports:
-      - "9000:9000"
-    depends_on:
-      - ingestion
-      - perception
-      - integration
-      - routing
-      - specialized
-      - meta
-      - memory
-      - aggregation
-      - feedback
-      - monitoring
-      - graph_rl
-      - comm_optimization
-    networks:
-      - hmas_network
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
+  prometheus_data:
+  grafana_data:
 
 networks:
-  hmas_network:
+  hmas-network:
     driver: bridge

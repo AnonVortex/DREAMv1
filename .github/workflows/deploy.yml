@@ -1,0 +1,103 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+
+env:
+  REGISTRY: ghcr.io
+  ORGANIZATION: ${{ github.repository_owner }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    environment: production
+    concurrency: production
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.12.0
+
+    - name: Set up kubeconfig
+      uses: azure/k8s-set-context@v3
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+        context: production-context
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Update Kubernetes secrets
+      run: |
+        kubectl create namespace hmas --dry-run=client -o yaml | kubectl apply -f -
+        
+        # Create secrets from GitHub secrets
+        kubectl create secret generic hmas-secrets \
+          --namespace=hmas \
+          --from-literal=MONGODB_USERNAME=${{ secrets.MONGODB_USERNAME }} \
+          --from-literal=MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }} \
+          --from-literal=REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
+          --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
+          --from-literal=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+          --from-literal=HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }} \
+          --from-literal=ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }} \
+          --from-literal=SIGNING_KEY=${{ secrets.SIGNING_KEY }} \
+          --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Deploy Kubernetes manifests
+      run: |
+        # Apply ConfigMaps
+        kubectl apply -f deployment/k8s/configmap.yaml
+        
+        # Apply PVCs
+        kubectl apply -f deployment/k8s/persistent-volumes.yaml
+        
+        # Apply Services
+        kubectl apply -f deployment/k8s/services.yaml
+        
+        # Update image tags in deployments
+        for service in perception memory learning reasoning communication feedback integration; do
+          yq eval ".spec.template.spec.containers[0].image = \"$REGISTRY/$ORGANIZATION/hmas-$service:${GITHUB_SHA}\"" \
+            deployment/k8s/deployment.yaml > deployment/k8s/deployment-$service.yaml
+          kubectl apply -f deployment/k8s/deployment-$service.yaml
+        done
+        
+        # Apply Ingress
+        kubectl apply -f deployment/k8s/ingress.yaml
+
+    - name: Verify deployment
+      run: |
+        for service in perception memory learning reasoning communication feedback integration; do
+          kubectl rollout status deployment/$service-service -n hmas --timeout=300s
+        done
+
+    - name: Run integration tests
+      if: success()
+      run: |
+        # Wait for services to be ready
+        sleep 30
+        
+        # Run integration tests
+        cd tests/integration
+        pip install -r requirements.txt
+        pytest -v
+
+    - name: Notify on Slack
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 

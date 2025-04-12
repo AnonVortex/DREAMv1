@@ -1,73 +1,97 @@
-# HMAS (AGI DREAM) - Hierarchical Multi-Agent System
+# Hierarchical Multi-Agent System (HMAS)
 
-## Overview
-This repository contains a **Hierarchical Multi-Agent System (HMAS)** prototype aimed at progressing toward AGI. The system is structured as multiple containerized microservices (Ingestion, Perception, Integration, Routing, Specialized, Meta, Memory, Aggregation, Feedback, Monitoring, Graph RL, Communication) plus a Pipeline Aggregator that orchestrates them end-to-end.
+## DREAMv1: Dynamic Reasoning and Evolving Autonomous Mind
+
+HMAS is a sophisticated artificial general intelligence (AGI) framework that implements a hierarchical multi-agent system. At its core is DREAMv1, our AGI engine designed to handle complex tasks through distributed intelligence, dynamic coalition formation, and adaptive learning mechanisms.
 
 ## Key Features
-- **Modular Architecture**: Each stage in the pipeline is its own containerized FastAPI service.
-- **Multi-Modal Data Handling**: Processes images, audio, text, etc.
-- **Rate Limiting & Monitoring**: Uses Redis + slowapi for rate limiting; Prometheus for metrics.
-- **Scalable & Extensible**: Docker-based microservices with potential for cloud deployment.
-- **Comprehensive Documentation**: Check the [`docs/`](./docs/) folder for architecture diagrams, deployment guides, developer setup, and API references.
 
-## Directory Structure
+- **Hierarchical Architecture**: Multi-layered agent organization for complex problem decomposition
+- **Distributed Intelligence**: Coordinated problem-solving across specialized agents
+- **Adaptive Learning**: Dynamic adjustment of strategies based on experience
+- **Scalable Design**: Microservices architecture for horizontal scaling
+- **Real-time Processing**: Fast decision-making with parallel processing
+- **Robust Security**: Built-in security measures and ethical constraints
+- **Extensible Framework**: Easy integration of new capabilities
 
-H-MAS(AGI DREAM)/
-├── ingestion/       # Data ingestion module
-├── perception/      # Perception module for multi-modal feature extraction
-├── integration/     # Integration module for fusing features
-├── routing/         # Routing module to allocate tasks
-├── specialized/     # Specialized processing (Graph RL, domain-specific tasks)
-├── meta/            # Meta-evaluation of specialized outputs
-├── memory/          # Archives meta outputs (long-term memory)
-├── aggregation/     # Combines memory data into a final decision
-├── feedback/        # Gathers system feedback metrics
-├── monitoring/      # Monitors resource usage & diagnostics
-├── graph_rl/        # Graph RL module for advanced decision-making
-├── communication/   # Optimizes inter-agent communication strategies
-├── pipelines/       # Pipeline aggregator that calls each module in sequence
-├── docs/            # Documentation (architecture, deployment, API references)
-└── docker-compose.yml
+## Core Modules
+
+1. **Perception**: Multi-modal input processing
+2. **Memory**: Distributed knowledge management
+3. **Learning**: Advanced machine learning integration
+4. **Reasoning**: Logic and decision-making engine
+5. **Communication**: Inter-agent messaging system
+6. **Feedback**: Performance monitoring and adaptation
+7. **Integration**: External system connectivity
+8. **Specialized**: Domain-specific capabilities
 
 ## Quick Start
- - Clone the repository:
-	``bash
-	Copy
-	git clone https://github.com/YourUsername/hmas-prototype.git
-	cd hmas-prototype
-	
-  - Run the entire pipeline:
-	``bash
-	Copy
-	docker-compose up --build
-	Trigger the pipeline aggregator:
-	``bash
-	Copy
-	curl -X POST http://localhost:9000/run_pipeline
 
-Documentation
-High-Level Architecture: docs/Architecture.md
-Deployment Guide: docs/DeploymentGuide.md
-Developer Setup: docs/DeveloperSetup.md
-API References: docs/api/
-Roadmap: docs/Roadmap.md
+### Prerequisites
 
-Testing
-Each module has its own tests/ folder with Pytest scripts. You can run them individually:
+- Python 3.9+
+- Docker
+- Kubernetes
+- Redis
+- MongoDB
 
-	``bash
-	Copy
-	python -m pytest ingestion/tests/
-	python -m pytest perception/tests/
-	# ...
-	Or use the Makefile to run them all at once (make test).
+### Installation
 
-Contributing
--Fork the repo & create feature branches from develop.
--Open PRs for review.
--See docs/DeveloperSetup.md for environment setup instructions.
--License
- See LICENSE for details
+```bash
+# Clone the repository
+git clone https://github.com/hmas/hmas.git
+cd hmas
 
-Contact
-For inquiries, please open an issue or reach out to sotoyaneza@gmail.com
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start services
+docker-compose up -d
+```
+
+### Building from Source
+
+```bash
+# Build core image
+docker build -t hmas/core:latest .
+
+# Build individual services
+docker-compose build
+```
+
+## Project Structure
+
+```
+hmas/
+├── src/                # Source code
+├── tests/              # Test suite
+├── docs/              # Documentation
+├── deployment/        # Deployment configs
+├── examples/          # Example implementations
+└── services/          # Microservices
+```
+
+## Documentation
+
+- [Architecture Overview](docs/Architecture.md)
+- [API Documentation](docs/api.md)
+- [Development Guide](docs/development.md)
+- [Deployment Guide](docs/deployment.md)
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under a dual-license model - see [LICENSE.txt](docs/LICENSE.txt) for details.
+
+## Contact
+
+- Website: https://hmas.ai
+- Email: contact@hmas.ai
+- Documentation: https://docs.hmas.ai

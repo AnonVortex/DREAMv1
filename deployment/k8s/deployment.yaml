@@ -1,0 +1,389 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perception-service
+  namespace: hmas
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: perception-service
+  template:
+    metadata:
+      labels:
+        app: perception-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8100"
+    spec:
+      containers:
+      - name: perception-service
+        image: hmas/perception-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8100
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        envFrom:
+        - configMapRef:
+            name: hmas-config
+        - secretRef:
+            name: hmas-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8100
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8100
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memory-service
+  namespace: hmas
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: memory-service
+  template:
+    metadata:
+      labels:
+        app: memory-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8200"
+    spec:
+      containers:
+      - name: memory-service
+        image: hmas/memory-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8200
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+        envFrom:
+        - configMapRef:
+            name: hmas-config
+        - secretRef:
+            name: hmas-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8200
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8200
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learning-service
+  namespace: hmas
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: learning-service
+  template:
+    metadata:
+      labels:
+        app: learning-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8300"
+    spec:
+      containers:
+      - name: learning-service
+        image: hmas/learning-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8300
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+        envFrom:
+        - configMapRef:
+            name: hmas-config
+        - secretRef:
+            name: hmas-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8300
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8300
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: models
+          mountPath: /app/models
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: models
+        persistentVolumeClaim:
+          claimName: learning-models-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reasoning-service
+  namespace: hmas
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: reasoning-service
+  template:
+    metadata:
+      labels:
+        app: reasoning-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8400"
+    spec:
+      containers:
+      - name: reasoning-service
+        image: hmas/reasoning-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8400
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+        envFrom:
+        - configMapRef:
+            name: hmas-config
+        - secretRef:
+            name: hmas-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8400
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8400
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: communication-service
+  namespace: hmas
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: communication-service
+  template:
+    metadata:
+      labels:
+        app: communication-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8500"
+    spec:
+      containers:
+      - name: communication-service
+        image: hmas/communication-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8500
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        envFrom:
+        - configMapRef:
+            name: hmas-config
+        - secretRef:
+            name: hmas-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8500
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8500
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feedback-service
+  namespace: hmas
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: feedback-service
+  template:
+    metadata:
+      labels:
+        app: feedback-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8600"
+    spec:
+      containers:
+      - name: feedback-service
+        image: hmas/feedback-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8600
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        envFrom:
+        - configMapRef:
+            name: hmas-config
+        - secretRef:
+            name: hmas-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8600
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8600
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: integration-service
+  namespace: hmas
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: integration-service
+  template:
+    metadata:
+      labels:
+        app: integration-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8700"
+    spec:
+      containers:
+      - name: integration-service
+        image: hmas/integration-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8700
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        envFrom:
+        - configMapRef:
+            name: hmas-config
+        - secretRef:
+            name: hmas-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8700
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8700
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {} 

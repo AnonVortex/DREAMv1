@@ -1,0 +1,70 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hmas-ingress
+  namespace: hmas
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - api.hmas.ai
+    secretName: hmas-tls-secret
+  rules:
+  - host: api.hmas.ai
+    http:
+      paths:
+      - path: /perception
+        pathType: Prefix
+        backend:
+          service:
+            name: perception-service
+            port:
+              number: 8100
+      - path: /memory
+        pathType: Prefix
+        backend:
+          service:
+            name: memory-service
+            port:
+              number: 8200
+      - path: /learning
+        pathType: Prefix
+        backend:
+          service:
+            name: learning-service
+            port:
+              number: 8300
+      - path: /reasoning
+        pathType: Prefix
+        backend:
+          service:
+            name: reasoning-service
+            port:
+              number: 8400
+      - path: /communication
+        pathType: Prefix
+        backend:
+          service:
+            name: communication-service
+            port:
+              number: 8500
+      - path: /feedback
+        pathType: Prefix
+        backend:
+          service:
+            name: feedback-service
+            port:
+              number: 8600
+      - path: /integration
+        pathType: Prefix
+        backend:
+          service:
+            name: integration-service
+            port:
+              number: 8700 

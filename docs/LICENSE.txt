@@ -1,9 +1,47 @@
-Proprietary License - HMAS-AGI-Prototype
-© 2025 Alexis Soto-Yanez. All rights reserved.
+HMAS-AGI-Prototype Dual License
 
-This software is proprietary and confidential. No part of this software may be
-reproduced, modified, or distributed without express permission from
-Alexis Soto-Yanez.
+Version 1.0, March 2024
 
-No license to use, copy, or distribute this software is granted, except as
-explicitly agreed upon in writing by Alexis Soto-Yanez.
+1. Non-Commercial License
+------------------------
+
+Permission is hereby granted, free of charge, to any person or organization obtaining a copy of this software and associated documentation files (the "Software"), to use, copy, modify, merge, and distribute the Software for non-commercial purposes only, subject to the following conditions:
+
+a) The above copyright notice and this license notice shall be included in all copies or substantial portions of the Software.
+b) The Software may not be used for any commercial purpose without obtaining a commercial license.
+c) Derivative works must also be licensed under these same terms.
+
+2. Commercial License
+--------------------
+
+For commercial use of the Software, including but not limited to:
+- Using the Software in a commercial product
+- Using the Software to provide commercial services
+- Using the Software in a business or organizational context
+- Generating revenue directly or indirectly from the use of the Software
+
+A commercial license must be obtained by contacting the copyright holders at [sotoyaneza@gmail.com].
+
+3. Definitions
+-------------
+
+"Commercial use" means any use of the Software intended for or directed toward commercial advantage or monetary compensation.
+
+"Non-commercial use" means use of the Software for research, personal, academic, or other non-monetary purposes.
+
+4. Disclaimer
+------------
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+5. Termination
+-------------
+
+This license automatically terminates if you fail to comply with any of its terms and conditions. You must then immediately cease using and distributing the Software.
+
+6. Miscellaneous
+---------------
+
+This License represents the complete agreement concerning the subject matter hereof.
+
+For commercial licensing inquiries, please contact: [info@hmas.ai]

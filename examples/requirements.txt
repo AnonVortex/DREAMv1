@@ -1,0 +1,8 @@
+numpy>=1.19.0
+matplotlib>=3.3.0
+jupyter>=1.0.0
+ipykernel>=5.3.0
+scikit-learn>=0.24.0  # For classification and clustering examples
+hmas>=0.1.0  # Assuming this is the version of your package
+pytest>=6.0.0  # For running tests
+pytest-asyncio>=0.14.0  # For async test support 

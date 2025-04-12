@@ -1,0 +1,163 @@
+name: Disaster Recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      backup_timestamp:
+        description: 'Backup timestamp to restore (YYYYMMDD-HHMMSS)'
+        required: true
+      restore_type:
+        description: 'What to restore (all, k8s, mongodb, redis, config)'
+        required: true
+        default: 'all'
+
+env:
+  BACKUP_BUCKET: ${{ secrets.BACKUP_BUCKET }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Set up kubeconfig
+      uses: azure/k8s-set-context@v3
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+        context: production-context
+
+    - name: Install Velero
+      if: ${{ github.event.inputs.restore_type == 'all' || github.event.inputs.restore_type == 'k8s' }}
+      run: |
+        wget https://github.com/vmware-tanzu/velero/releases/download/v1.11.0/velero-v1.11.0-linux-amd64.tar.gz
+        tar -xvf velero-v1.11.0-linux-amd64.tar.gz
+        sudo mv velero-v1.11.0-linux-amd64/velero /usr/local/bin/
+        rm -rf velero-v1.11.0-linux-amd64*
+
+    - name: Scale down deployments
+      run: |
+        for service in perception memory learning reasoning communication feedback integration; do
+          kubectl scale deployment $service-service -n hmas --replicas=0
+        done
+        
+        # Wait for pods to terminate
+        kubectl wait --for=delete pod -l app -n hmas --timeout=300s
+
+    - name: Restore Kubernetes Resources
+      if: ${{ github.event.inputs.restore_type == 'all' || github.event.inputs.restore_type == 'k8s' }}
+      run: |
+        BACKUP_NAME="hmas-backup-${{ github.event.inputs.backup_timestamp }}"
+        
+        # Restore from Velero backup
+        velero restore create --from-backup $BACKUP_NAME \
+          --include-namespaces hmas \
+          --wait
+
+    - name: Restore MongoDB
+      if: ${{ github.event.inputs.restore_type == 'all' || github.event.inputs.restore_type == 'mongodb' }}
+      run: |
+        # Download backup from S3
+        aws s3 cp s3://${{ env.BACKUP_BUCKET }}/mongodb/mongodb-backup-${{ github.event.inputs.backup_timestamp }}.tar.gz mongodb-backup.tar.gz
+        
+        # Extract backup
+        mkdir -p mongodb-backup
+        tar -xzf mongodb-backup.tar.gz -C mongodb-backup
+        
+        # Get MongoDB pod name
+        MONGO_POD=$(kubectl get pod -n hmas -l app=mongodb -o jsonpath="{.items[0].metadata.name}")
+        
+        # Copy backup to pod
+        kubectl cp mongodb-backup hmas/$MONGO_POD:/tmp/restore
+        
+        # Restore using mongorestore
+        kubectl exec -n hmas $MONGO_POD -- mongorestore \
+          --username=${{ secrets.MONGODB_USERNAME }} \
+          --password=${{ secrets.MONGODB_PASSWORD }} \
+          --drop \
+          /tmp/restore
+
+    - name: Restore Redis
+      if: ${{ github.event.inputs.restore_type == 'all' || github.event.inputs.restore_type == 'redis' }}
+      run: |
+        # Download backup from S3
+        aws s3 cp s3://${{ env.BACKUP_BUCKET }}/redis/redis-backup-${{ github.event.inputs.backup_timestamp }}.rdb redis-backup.rdb
+        
+        # Get Redis pod name
+        REDIS_POD=$(kubectl get pod -n hmas -l app=redis -o jsonpath="{.items[0].metadata.name}")
+        
+        # Stop Redis server
+        kubectl exec -n hmas $REDIS_POD -- redis-cli -a ${{ secrets.REDIS_PASSWORD }} SHUTDOWN SAVE
+        
+        # Copy backup to pod
+        kubectl cp redis-backup.rdb hmas/$REDIS_POD:/data/dump.rdb
+        
+        # Start Redis server
+        kubectl exec -n hmas $REDIS_POD -- redis-server /etc/redis/redis.conf
+
+    - name: Restore Configurations
+      if: ${{ github.event.inputs.restore_type == 'all' || github.event.inputs.restore_type == 'config' }}
+      run: |
+        # Download config backup
+        aws s3 cp s3://${{ env.BACKUP_BUCKET }}/configs/config-backup-${{ github.event.inputs.backup_timestamp }}.tar.gz config-backup.tar.gz
+        
+        # Extract configs
+        tar -xzf config-backup.tar.gz
+        
+        # Apply configurations
+        kubectl apply -f config-backup/configmaps.yaml
+        kubectl apply -f config-backup/secrets.yaml
+        kubectl apply -f config-backup/resources.yaml
+
+    - name: Scale up deployments
+      run: |
+        for service in perception memory learning reasoning communication feedback integration; do
+          kubectl scale deployment $service-service -n hmas --replicas=1
+        done
+        
+        # Wait for pods to be ready
+        kubectl wait --for=condition=ready pod -l app -n hmas --timeout=300s
+
+    - name: Verify restoration
+      run: |
+        # Check pod status
+        kubectl get pods -n hmas
+        
+        # Check services
+        kubectl get services -n hmas
+        
+        # Check deployments
+        kubectl get deployments -n hmas
+
+    - name: Run health checks
+      run: |
+        # Wait for services to be ready
+        sleep 30
+        
+        # Run integration tests
+        cd tests/integration
+        pip install -r requirements.txt
+        pytest -v
+
+    - name: Notify on Slack
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+        text: |
+          Disaster Recovery Status: ${{ job.status }}
+          Restore Type: ${{ github.event.inputs.restore_type }}
+          Backup Timestamp: ${{ github.event.inputs.backup_timestamp }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 

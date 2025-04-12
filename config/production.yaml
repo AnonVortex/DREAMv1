@@ -1,0 +1,71 @@
+# Production environment configuration for HMAS services
+
+# Inherit from default configuration
+_extends: default.yaml
+
+# Environment settings
+debug: false
+testing: false
+host: "0.0.0.0"
+port: 8000
+base_url: "https://api.hmas.ai"
+
+# Database configuration
+database:
+  host: "mongodb.hmas.svc.cluster.local"
+  port: 27017
+  username: "${HMAS_DB_USERNAME}"  # Set via environment variable
+  database: "hmas_prod"
+  max_connections: 50
+  timeout: 15.0
+  ssl_enabled: true
+
+# Redis configuration
+redis:
+  host: "redis.hmas.svc.cluster.local"
+  port: 6379
+  password: "${HMAS_REDIS_PASSWORD}"  # Set via environment variable
+  db: 0
+  ssl_enabled: true
+
+# Security configuration
+security:
+  token_expiry: 3600  # 1 hour
+  allowed_origins:
+    - "https://hmas.ai"
+    - "https://api.hmas.ai"
+    - "https://admin.hmas.ai"
+  ssl_enabled: true
+  ssl_cert_path: "/etc/ssl/certs/hmas.crt"
+  ssl_key_path: "/etc/ssl/private/hmas.key"
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_path: "/var/log/hmas/hmas.log"
+  rotate_size: 104857600  # 100MB
+  rotate_count: 10
+  json_format: true  # JSON format for better log aggregation
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  prometheus_enabled: true
+  metrics_port: 9090
+  health_check_interval: 30
+  tracing_enabled: true
+  tracing_sample_rate: 0.1  # Sample 10% of requests
+
+# Resource limits
+resource_limits:
+  cpu_limit: "2"
+  memory_limit: "4Gi"
+  storage_limit: "50Gi"
+  max_workers: 8
+  request_timeout: 30
+
+# Directories
+temp_dir: "/tmp"
+data_dir: "/data"
+config_dir: "/config" 

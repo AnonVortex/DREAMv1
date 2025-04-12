@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hmas-config
+  namespace: hmas
+data:
+  # Global Configuration
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  METRICS_ENABLED: "true"
+  TRACING_ENABLED: "true"
+  
+  # Service Ports
+  PERCEPTION_SERVICE_PORT: "8100"
+  MEMORY_SERVICE_PORT: "8200"
+  LEARNING_SERVICE_PORT: "8300"
+  REASONING_SERVICE_PORT: "8400"
+  COMMUNICATION_SERVICE_PORT: "8500"
+  FEEDBACK_SERVICE_PORT: "8600"
+  INTEGRATION_SERVICE_PORT: "8700"
+  
+  # Service URLs
+  PERCEPTION_SERVICE_URL: "http://perception-service:8100"
+  MEMORY_SERVICE_URL: "http://memory-service:8200"
+  LEARNING_SERVICE_URL: "http://learning-service:8300"
+  REASONING_SERVICE_URL: "http://reasoning-service:8400"
+  COMMUNICATION_SERVICE_URL: "http://communication-service:8500"
+  FEEDBACK_SERVICE_URL: "http://feedback-service:8600"
+  INTEGRATION_SERVICE_URL: "http://integration-service:8700"
+  
+  # Database Configuration
+  MONGODB_HOST: "mongodb-service"
+  MONGODB_PORT: "27017"
+  MONGODB_DATABASE: "hmas"
+  
+  # Redis Configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  
+  # Monitoring Configuration
+  PROMETHEUS_PORT: "9090"
+  GRAFANA_PORT: "3000"
+  
+  # Security Configuration
+  JWT_EXPIRATION: "3600"
+  RATE_LIMIT_ENABLED: "true"
+  RATE_LIMIT_REQUESTS: "100"
+  RATE_LIMIT_WINDOW: "60"
+
+  META_LEARNING_ENABLED: "true"
+  MONITORING_ENABLED: "true"
+  MAX_WORKERS: "4"
+  CHECKPOINT_INTERVAL: "300" 
