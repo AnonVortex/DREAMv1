@@ -1,7 +1,7 @@
-# HMAS Deployment Guide
+# DREAMv1 Deployment Guide
 
 ## Overview
-This guide covers the deployment process for the Hierarchical Multi-Agent System (HMAS) in both development and production environments.
+This guide covers the deployment process for DREAMv1 in both development and production environments.
 
 ## Prerequisites
 
@@ -24,7 +24,7 @@ This guide covers the deployment process for the Hierarchical Multi-Agent System
 ### 1. Environment Setup
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/hmas.git
+git clone https://github.com/AnonVortex/DREAMv1.git
 cd hmas
 
 # Create virtual environment
