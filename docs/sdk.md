@@ -1,4 +1,4 @@
-# HMAS SDK Documentation
+# SDK Documentation
 
 ## License
 
