@@ -1,4 +1,4 @@
-# Contributing to H-MAS (AGI DREAM)
+# Contributing to DREAMv1
 
 Thank you for your interest in contributing to H-MAS! This document provides guidelines and instructions for contributing to the project.
 
@@ -12,7 +12,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
    - Fork the repository to your GitHub account
    - Clone your fork locally
    ```bash
-   git clone https://github.com/your-username/h-mas.git
+   git clone https://github.com/AnonVortex/DREAMv1.git
    cd h-mas
    ```
 
