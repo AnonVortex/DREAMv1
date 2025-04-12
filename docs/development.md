@@ -1,4 +1,4 @@
-# HMAS Development Guide
+# Development Guide
 
 ## Overview
 
