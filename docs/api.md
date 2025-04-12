@@ -1,4 +1,4 @@
-# HMAS API Documentation
+# API Documentation
 
 ## License
 
