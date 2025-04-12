@@ -39,8 +39,8 @@ HMAS is a sophisticated artificial general intelligence (AGI) framework that imp
 
 ```bash
 # Clone the repository
-git clone https://github.com/hmas/hmas.git
-cd hmas
+git clone https://github.com/AnonVortex/DREAMv1.git
+cd DREAMv1
 
 # Install dependencies
 pip install -r requirements.txt
@@ -63,10 +63,10 @@ docker build -t hmas/core:latest .
 docker-compose build
 ```
 
-## Project Structure
+## Project Structure(In Progress)
 
 ```
-hmas/
+DREAMv1/
 ├── src/                # Source code
 ├── tests/              # Test suite
 ├── docs/              # Documentation
@@ -92,6 +92,6 @@ This project is licensed under a dual-license model - see [LICENSE.txt](docs/LIC
 
 ## Contact
 
-- Website: https://hmas.ai
-- Email: contact@hmas.ai
-- Documentation: https://docs.hmas.ai
+- Website: https://hmas.ai (Coming Soon)
+- Email: info@hmas.ai
+- Documentation: https://docs.hmas.ai (Coming Soon)
