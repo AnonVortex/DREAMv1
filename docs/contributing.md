@@ -1,4 +1,4 @@
-# Contributing to HMAS
+# Contributing to DREAMv1
 
 ## License
 
