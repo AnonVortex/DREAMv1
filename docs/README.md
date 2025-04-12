@@ -50,7 +50,7 @@ HMAS is an advanced artificial intelligence framework that implements a hierarch
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/hmas.git
+   git clone https://github.com/AnonVortex/DREAMv1.git
    cd hmas
    ```
 
