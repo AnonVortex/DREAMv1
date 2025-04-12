@@ -129,4 +129,4 @@ For questions and support:
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the project's [MIT License](LICENSE). 
+By contributing, you agree that your contributions will be licensed under the project's [Dual-License](LICENSE). 
