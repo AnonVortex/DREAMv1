@@ -7,18 +7,22 @@ on:
     branches: [ main ]
 
 jobs:
+  setup:
+    uses: ./.github/workflows/shared-config.yml
+
   test:
+    needs: setup
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10]
+        python-version: ['3.9', '3.10', '3.11']
         service: [perception, memory, learning, reasoning, communication, feedback, integration]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -34,21 +38,22 @@ jobs:
         pytest ${{ matrix.service }}/tests/ --cov=${{ matrix.service }} --cov-report=xml
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
         flags: ${{ matrix.service }}
         name: ${{ matrix.service }}-python-${{ matrix.python-version }}
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11'
         cache: 'pip'
 
     - name: Install dependencies
